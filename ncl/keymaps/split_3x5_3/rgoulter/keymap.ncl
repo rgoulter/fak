@@ -1,10 +1,5 @@
 # Port of rgoulter's split_3x5_3 layout,
 #  which is a slightly modified Miryoku layout.
-#
-# A "layout" is the list of layers for a keymap,
-#  without the virtual keys.
-#
-# The layout can be used by including it in a keymap.
 
 let keycode = import "../../../fak/keycode.ncl" in
 let { BoundedInt, .. } = import "../../../fak/util_types.ncl" in
@@ -13,6 +8,7 @@ let { BoundedInt, .. } = import "../../../fak/util_types.ncl" in
 # Prelude aliases
 let kc = keycode.tap.reg.kc in
 let ks = keycode.tap.reg.ks in
+let mod = keycode.tap.reg.mod in
 
 let fk = keycode.tap.custom.fak in
 let me = keycode.tap.custom.media in
@@ -190,5 +186,43 @@ let supplemental_layers = [
 
 ] in
 
-# Layout definition
-base_layers @ supplemental_layers
+
+# Combo Indices definitions
+# the four corners of the alpha keys
+let alphas_four_corner_indices = [0, 9, 20, 29] in
+# the index & middle fingers on lower row, LHS ("CV" on QWERTY)
+let lhs_lower_12_indices = [22, 23] in
+# the index & middle fingers on lower row, RHS ("M," on QWERTY)
+let rhs_lower_12_indices = [26, 27] in
+
+# Convenience keycode definitions
+
+# Desktop Keys
+# Linux
+let LINUX_DESKTOP_LEFT  = kc.LEFT & mod.lctl & mod.lalt in
+let LINUX_DESKTOP_RIGHT = kc.RGHT & mod.lctl & mod.lalt in
+
+
+# Keymap definition
+{
+  virtual_keys = [
+    keycode.combo.make 255 alphas_four_corner_indices,
+    keycode.combo.make 50 lhs_lower_12_indices,
+    keycode.combo.make 50 rhs_lower_12_indices,
+  ],
+  layers =
+    let combo_keys = [
+      # Combo 0 (four corners of alpha keys): enter bootloader
+      keycode.tap.custom.fak.BOOT,
+      # Combo 1 (left lower): Desktop: Workspace left
+      LINUX_DESKTOP_LEFT,
+      # Combo 2 (right lower): Desktop: Workspace right
+      LINUX_DESKTOP_RIGHT,
+    ] in
+
+    # Concatenate combo keys to each layer
+    std.array.map
+      (fun layer =>
+        layer @ combo_keys)
+      (base_layers @ supplemental_layers),
+}
