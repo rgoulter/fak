@@ -52,60 +52,67 @@ let ENT_NSSL = LT _NSSL kc.ENT in
 let DEL_FUNL = LT _FUNL kc.DEL in
 
 
-# Home-Row Modifier Helper functions
-let LALT_T = fun tap =>
-    keycode.hold.reg.behavior holdtap_behavior_common &
-    keycode.hold.reg.mod.lalt &
-    tap in
-let LGUI_T = fun tap =>
-    keycode.hold.reg.behavior holdtap_behavior_common &
-    keycode.hold.reg.mod.lgui &
-    tap in
-let LCTL_T = fun tap =>
-    keycode.hold.reg.behavior holdtap_behavior_common &
-    keycode.hold.reg.mod.lctl &
-    tap in
-let LSFT_T = fun tap =>
-    keycode.hold.reg.behavior holdtap_behavior_common &
-    keycode.hold.reg.mod.lsft &
-    tap in
+# Keymap and Home-Row Modifier Helper functions
 
+# Mods to use for home row modifiers,
+#  from pinky to index finger ("asdf").
+#
+# LHS mods are used, because it's more common to encounter
+#  situations where only LHS mods are recognised,
+#  than only RHS mods.
+let home_row_mods = let
+  mod = keycode.hold.reg.mod
+in [
+    mod.lalt,
+    mod.lgui,
+    mod.lctl,
+    mod.lsft,
+] in
 
-# Home Row Mod Segments
+# Construct array with fak keycodes for each letter in the string.
+#
+# Casing is ignored; letters are unshifted. i.e. "a1!" is treated the same as "A1!".
+#
+# e.g. lift_to_keycodes "qwerty" == [kc.Q, kc.W, kc.E, kc.R, kc.T, kc.Y]
+let lift_to_keycodes = fun letters => letters
+  |> std.string.uppercase
+  |> std.string.characters
+  |> std.array.map (fun c => keycode.tap.reg.kc."%{c}") in
 
-# Home Row Mods, Dvorak, LH
-let LALTT_A = LALT_T kc.A in
-let LGUIT_O = LGUI_T kc.O in
-let LCTLT_E = LCTL_T kc.E in
-let LSFTT_U = LSFT_T kc.U in
+# Augments an array of keycodes with home row modifier behaviours,
+#  for the LHS home row keycodes.
+#
+# The first four keycodes are augmented with the home row modifiers,
+# the rest are unchanged.
+let with_home_row_mods_lhs = fun keycodes =>
+  std.array.generate
+    (fun idx =>
+      let kc = std.array.at idx keycodes in
+      if idx < std.array.length home_row_mods then
+        keycode.hold.reg.behavior holdtap_behavior_common &
+        std.array.at idx home_row_mods &
+        kc
+      else
+        kc)
+    (std.array.length keycodes) in
 
-# Home Row Mods, Dvorak, RH
-# Use LHS mods instead of RHS.
-let RSFTT_H = LSFT_T kc.H in
-let RCTLT_T = LCTL_T kc.T in
-let RGUIT_N = LGUI_T kc.N in
-let RALTT_S = LALT_T kc.S in
+# Augments an array of keycodes with home row modifier behaviours,
+#  for the RHS home row keycodes.
+#
+# The first four keycodes are augmented with the home row modifiers,
+# the rest are unchanged.
+let with_home_row_mods_rhs = fun keycodes =>
+  # reverse keycodes so it's "lhs", add mods, then reverse that.
+  keycodes |> std.array.reverse |> with_home_row_mods_lhs |> std.array.reverse in
 
 # Alphabetical Segments, Dvorak
-let SEG5_DVORAK_LHS_1 = [
-  kc.QUOT, kc.COMM, kc.DOT,  kc.P,    kc.Y,
-] in
-let SEG5_DVORAK_LHS_2 = [
-  LALTT_A, LGUIT_O, LCTLT_E, LSFTT_U, kc.I,
-] in
-let SEG5_DVORAK_LHS_3 = [
-  kc.SCLN, kc.Q,    kc.J,    kc.K,    kc.X,
-] in
+let SEG5_DVORAK_LHS_1 = "',.py" |> lift_to_keycodes in
+let SEG5_DVORAK_LHS_2 = "aoeui" |> lift_to_keycodes |> with_home_row_mods_lhs in
+let SEG5_DVORAK_LHS_3 = ";qjkx" |> lift_to_keycodes in
 
-let SEG5_DVORAK_RHS_1 = [
-  kc.F,    kc.G,    kc.C,    kc.R,    kc.L,
-] in
-let SEG5_DVORAK_RHS_2 = [
-  kc.D,    RSFTT_H, RCTLT_T, RGUIT_N, RALTT_S,
-] in
-let SEG5_DVORAK_RHS_3 = [
-  kc.B,    kc.M,    kc.W,    kc.V,    kc.Z,
-] in
+let SEG5_DVORAK_RHS_1 = "fgcrl" |> lift_to_keycodes in
+let SEG5_DVORAK_RHS_2 = "dhtns" |> lift_to_keycodes |> with_home_row_mods_rhs in
+let SEG5_DVORAK_RHS_3 = "bmwvz" |> lift_to_keycodes in
 
 
 # Enter/NSSL on medial key.
