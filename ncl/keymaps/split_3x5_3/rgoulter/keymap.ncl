@@ -2,7 +2,6 @@
 #  which is a slightly modified Miryoku layout.
 
 let keycode = import "../../../fak/keycode.ncl" in
-let { BoundedInt, .. } = import "../../../fak/util_types.ncl" in
 
 
 # Prelude aliases
@@ -30,8 +29,6 @@ let holdtap_behavior_common = {
 let num_base_layers = 1 in
 let num_supplemental_layers = 6 in
 let num_layers = num_base_layers + num_supplemental_layers in
-# Impl. note: Reassure Nickel/Fak that we only reference valid layers.
-let LayerIndex = BoundedInt 0 num_layers in
 
 # Convenience tap-hold functions
 let LT = fun layer_num tap => keycode.LT holdtap_behavior_common layer_num tap in
