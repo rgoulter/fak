@@ -67,6 +67,7 @@ let encode_tappable = fun { type, data } => match {
       'consumer => 1,
       'user => 2,
       'mouse => 3,
+      'caps_word => 4,
     } data.type,
   'transparent => 65535
 } type in
@@ -173,6 +174,7 @@ let _central_defines = {
   CONSUMER_KEYS_ENABLE = is_custom_keys_of_type_used 'consumer,
   USER_KEYS_ENABLE = is_custom_keys_of_type_used 'user,
   MOUSE_KEYS_ENABLE = is_custom_keys_of_type_used 'mouse,
+  CAPS_WORD_ENABLE = is_custom_keys_of_type_used 'caps_word,
 
   COMBO_COUNT = combo_count,
   COMBO_REQUIRE_PRIOR_IDLE_MS_ENABLE = combos
