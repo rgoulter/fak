@@ -16,6 +16,9 @@ let ms = keycode.tap.custom.mouse in
 let XXXX = keycode.tap.none & keycode.hold.none in
 let TTTT = keycode.tap.trans & keycode.hold.trans in
 
+let BOOT = keycode.tap.custom.fak.BOOT in
+let CW = keycode.tap.custom.caps_word.TOGG in
+
 
 # Tap hold behaviors
 let holdtap_behavior_common = {
@@ -115,9 +118,7 @@ let SEG5_DVORAK_RHS_2 = "dhtns" |> lift_to_keycodes |> with_home_row_mods_rhs in
 let SEG5_DVORAK_RHS_3 = "bmwvz" |> lift_to_keycodes in
 
 
-# Enter/NSSL on medial key.
-
-#  define THUMB_ROW TAB_MOUR, ESC_MEDR, SPC_NAVR,    ENT_NSSL, BKSP_NSL, DEL_FUNL
+# Different from Miryoku: LHS: miryoku has tab on the medial key; i.e. ESC/MedR, Spc/NavR, Tab/MouR.
 let THUMB_ROW = [
     TAB_MOUR, ESC_MEDR, SPC_NAVR,    ENT_NSSL, BKSP_NSL, DEL_FUNL
 ] in
@@ -138,7 +139,7 @@ let supplemental_layers = [
 ## TBI: Different from Miryoku: Nav, RHS, upper: TBI the convenience cut/copy/paste and undo/redo
 [
   TTTT, TTTT, TTTT, TTTT, TTTT,               TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,               kc.LEFT, kc.DOWN, kc.UP,   kc.RGHT, kc.CAPS,
+  TTTT, TTTT, TTTT, TTTT, TTTT,               kc.LEFT, kc.DOWN, kc.UP,   kc.RGHT, CW,
   TTTT, TTTT, TTTT, TTTT, TTTT,               kc.HOME, kc.PGDN, kc.PGUP, kc.END,  kc.INS,
                     TTTT, TTTT, TTTT, kc.SPC, kc.BSPC, kc.DEL,
 ],
@@ -158,7 +159,7 @@ let supplemental_layers = [
 [
   TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
   TTTT, TTTT, TTTT, TTTT, TTTT,                me.PREV, me.VOLD, me.VOLU, me.NEXT, TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
+  TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    BOOT,
                     TTTT, TTTT, TTTT, me.PLAY, TTTT,    me.MUTE,
 ],
 
@@ -217,7 +218,7 @@ let LINUX_DESKTOP_RIGHT = kc.RGHT & mod.lctl & mod.lalt in
   layers =
     let combo_keys = [
       # Combo 0 (four corners of alpha keys): enter bootloader
-      keycode.tap.custom.fak.BOOT,
+      BOOT,
       # Combo 1 (left lower): Desktop: Workspace left
       LINUX_DESKTOP_LEFT,
       # Combo 2 (right lower): Desktop: Workspace right
