@@ -109,13 +109,20 @@ let with_home_row_mods_rhs = fun keycodes =>
   keycodes |> std.array.reverse |> with_home_row_mods_lhs |> std.array.reverse in
 
 # Alphabetical Segments, Dvorak
-let SEG5_DVORAK_LHS_1 = "',.py" |> lift_to_keycodes in
-let SEG5_DVORAK_LHS_2 = "aoeui" |> lift_to_keycodes |> with_home_row_mods_lhs in
-let SEG5_DVORAK_LHS_3 = ";qjkx" |> lift_to_keycodes in
+let dvorak_alphas = "
+  ',.pyfgcrl
+  aoeuidhtns
+  ;qjkxbmwvz
+" |> std.string.replace_regex "\\s+" "" in
 
-let SEG5_DVORAK_RHS_1 = "fgcrl" |> lift_to_keycodes in
-let SEG5_DVORAK_RHS_2 = "dhtns" |> lift_to_keycodes |> with_home_row_mods_rhs in
-let SEG5_DVORAK_RHS_3 = "bmwvz" |> lift_to_keycodes in
+let SEG5_DVORAK_LHS_1 = dvorak_alphas |> std.string.substring  0  5 |> lift_to_keycodes in
+let SEG5_DVORAK_RHS_1 = dvorak_alphas |> std.string.substring  5 10 |> lift_to_keycodes in
+
+let SEG5_DVORAK_LHS_2 = dvorak_alphas |> std.string.substring 10 15 |> lift_to_keycodes |> with_home_row_mods_lhs in
+let SEG5_DVORAK_RHS_2 = dvorak_alphas |> std.string.substring 15 20 |> lift_to_keycodes |> with_home_row_mods_rhs in
+
+let SEG5_DVORAK_LHS_3 = dvorak_alphas |> std.string.substring 20 25 |> lift_to_keycodes in
+let SEG5_DVORAK_RHS_3 = dvorak_alphas |> std.string.substring 25 30 |> lift_to_keycodes in
 
 
 # Different from Miryoku: LHS: miryoku has tab on the medial key; i.e. ESC/MedR, Spc/NavR, Tab/MouR.
