@@ -2,6 +2,7 @@
 # https://github.com/manna-harbour/miryoku/tree/master/docs/reference
 
 let keycode = import "../../../fak/keycode.ncl" in
+let layouts = import "../../../layouts.ncl" in
 
 
 # Prelude aliases
@@ -107,13 +108,14 @@ let with_home_row_mods_rhs = fun keycodes =>
   keycodes |> std.array.reverse |> with_home_row_mods_lhs |> std.array.reverse in
 
 # Alphabetical Segments, QWERTY
-let SEG5_QWERTY_LHS_1 = "qwert" |> lift_to_keycodes in
-let SEG5_QWERTY_LHS_2 = "asdfg" |> lift_to_keycodes |> with_home_row_mods_lhs in
-let SEG5_QWERTY_LHS_3 = "zxcvb" |> lift_to_keycodes in
+let alphas_segments = layouts.to_keycode_segments layouts.qwerty in
+let SEG5_QWERTY_LHS_1 = alphas_segments.lhs1 in
+let SEG5_QWERTY_LHS_2 = alphas_segments.lhs2 |> with_home_row_mods_lhs in
+let SEG5_QWERTY_LHS_3 = alphas_segments.lhs3 in
 
-let SEG5_QWERTY_RHS_1 = "yuiop" |> lift_to_keycodes in
-let SEG5_QWERTY_RHS_2 = "hjkl;" |> lift_to_keycodes |> with_home_row_mods_rhs in
-let SEG5_QWERTY_RHS_3 = "nm.,/" |> lift_to_keycodes in
+let SEG5_QWERTY_RHS_1 = alphas_segments.rhs1 in
+let SEG5_QWERTY_RHS_2 = alphas_segments.rhs2 |> with_home_row_mods_rhs in
+let SEG5_QWERTY_RHS_3 = alphas_segments.rhs3 in
 
 
 let THUMB_ROW = [
