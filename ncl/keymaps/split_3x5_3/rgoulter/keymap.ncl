@@ -158,29 +158,34 @@ let with_home_row_mods_rhs = fun keycodes =>
   # reverse keycodes so it's "lhs", add mods, then reverse that.
   keycodes |> std.array.reverse |> with_home_row_mods_lhs |> std.array.reverse in
 
-# Alphabetical Segments, Dvorak
-let dvorak_segments = to_keycode_segments dvorak in
-let SEG5_DVORAK_LHS_1 = dvorak_segments.lhs1 in
-let SEG5_DVORAK_LHS_2 = dvorak_segments.lhs2 |> with_home_row_mods_lhs in
-let SEG5_DVORAK_LHS_3 = dvorak_segments.lhs3 in
-
-let SEG5_DVORAK_RHS_1 = dvorak_segments.rhs1 in
-let SEG5_DVORAK_RHS_2 = dvorak_segments.rhs2 |> with_home_row_mods_rhs in
-let SEG5_DVORAK_RHS_3 = dvorak_segments.rhs3 in
-
 
 # Different from Miryoku: LHS: miryoku has tab on the medial key; i.e. ESC/MedR, Spc/NavR, Tab/MouR.
 let THUMB_ROW = [
     TAB_MOUR, ESC_MEDR, SPC_NAVR,    ENT_NSSL, BKSP_NSL, DEL_FUNL
 ] in
 
+# Takes in a 30-character string for the alphabetical keys,
+# and constructs the base layer for the keymap.
+#
+# The home row keys are augmented with home row modifiers.
+let make_base_layer = fun alphas_str =>
+  let segments = to_keycode_segments alphas_str in
+  let lhs1 = segments.lhs1 in
+  let lhs2 = segments.lhs2 |> with_home_row_mods_lhs in
+  let lhs3 = segments.lhs3 in
+
+  let rhs1 = segments.rhs1 in
+  let rhs2 = segments.rhs2 |> with_home_row_mods_rhs in
+  let rhs3 = segments.rhs3 in
+  lhs1 @ rhs1 @
+  lhs2 @ rhs2 @
+  lhs3 @ rhs3 @
+   THUMB_ROW in
+
 # Base Layers
-# 0: Dvorak
 let base_layers = [
-    SEG5_DVORAK_LHS_1 @ SEG5_DVORAK_RHS_1 @
-    SEG5_DVORAK_LHS_2 @ SEG5_DVORAK_RHS_2 @
-    SEG5_DVORAK_LHS_3 @ SEG5_DVORAK_RHS_3 @
-                  THUMB_ROW,
+    # 0: Dvorak
+    make_base_layer dvorak,
 ] in
 
 
