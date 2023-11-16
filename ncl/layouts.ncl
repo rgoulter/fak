@@ -37,23 +37,22 @@ in {
     zxmcv kl,./
   "%,
 } |> std.record.map_values fixup_alphas & {
+  # Construct array with fak keycodes for each letter in the string.
+  #
+  # Casing is ignored; letters can be unshifted. i.e. "a1!" is treated the same as "A1!".
+  #
+  # e.g. lift_to_keycodes "qwerty" == [kc.Q, kc.W, kc.E, kc.R, kc.T, kc.Y]
+  lift_to_keycodes = fun letters => letters
+    |> std.string.uppercase
+    |> std.string.characters
+    |> std.array.map (fun c => keycode.tap.reg.kc."%{c}"),
   # Construct record where values are arrays fak keycodes for each letter,
   #  for the left and right hand side of each row.
   #
   # e.g. to_keycode_segments qwerty == { lhs1 = [kc.Q, kc.W, kc.E, kc.R, kc.T], ... }
   to_keycode_segments
     | doc "Splits an alphas layout into 5-char segments for the left and right sides of each row. `alphas` are the 30 'alphabetical' keys in the layout."
-    = fun alphas => let
-      # Construct array with fak keycodes for each letter in the string.
-      #
-      # Casing is ignored; letters can be unshifted. i.e. "a1!" is treated the same as "A1!".
-      #
-      # e.g. lift_to_keycodes "qwerty" == [kc.Q, kc.W, kc.E, kc.R, kc.T, kc.Y]
-      lift_to_keycodes = fun letters => letters
-        |> std.string.uppercase
-        |> std.string.characters
-        |> std.array.map (fun c => keycode.tap.reg.kc."%{c}")
-      in {
+    = fun alphas => {
         lhs1 = alphas |> std.string.substring  0  5 |> lift_to_keycodes,
         rhs1 = alphas |> std.string.substring  5 10 |> lift_to_keycodes,
         lhs2 = alphas |> std.string.substring 10 15 |> lift_to_keycodes,
