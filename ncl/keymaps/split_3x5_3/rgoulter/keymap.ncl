@@ -39,21 +39,80 @@ let LT = fun layer_num tap => keycode.LT holdtap_behavior_common layer_num tap i
 
 
 # Miryoku-ish layers
-let _NAVR = num_base_layers + 0 in
-let _MOUR = num_base_layers + 1 in
-let _MEDR = num_base_layers + 2 in
-let _NSL  = num_base_layers + 3 in
-let _NSSL = num_base_layers + 4 in
-let _FUNL = num_base_layers + 5 in
+let supplemental_layers_record = {
+
+  # NavR (Navigation keys)
+  ## TBI: "Desktop Keys": set-OS (Win, MacOS, Linux)
+  ## TBI: Different from Miryoku: Nav, RHS, upper: TBI the convenience cut/copy/paste and undo/redo
+  NavR = [
+    TTTT, TTTT, TTTT, TTTT, TTTT,               TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
+    TTTT, TTTT, TTTT, TTTT, TTTT,               kc.LEFT, kc.DOWN, kc.UP,   kc.RGHT, CW,
+    TTTT, TTTT, TTTT, TTTT, TTTT,               kc.HOME, kc.PGDN, kc.PGUP, kc.END,  kc.INS,
+                      TTTT, TTTT, TTTT, kc.SPC, kc.BSPC, kc.DEL,
+  ],
+
+  # MouR (Mouse keys)
+  MouR = [
+    TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
+    TTTT, TTTT, TTTT, TTTT, TTTT,                ms.LEFT, ms.DOWN, ms.UP,   ms.RGHT, TTTT,
+    TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    ms.WH_D, ms.WH_U, TTTT,    TTTT,
+                      TTTT, TTTT, TTTT, ms.BTN1, ms.BTN2, ms.BTN3,
+  ],
+
+  # MedR (Media keys)
+  # Different from Miryoku: No RGB, no external power, no bluetooth.
+  # Different from Miryoku: Used to change default base layer / enter bootloader.
+  # TBI: fak/keycodencl: tap.custom.media.STOP key.
+  MedR = [
+    TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
+    TTTT, TTTT, TTTT, TTTT, TTTT,                me.PREV, me.VOLD, me.VOLU, me.NEXT, TTTT,
+    TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    BOOT,
+                      TTTT, TTTT, TTTT, me.PLAY, TTTT,    me.MUTE,
+  ],
+
+  # NSL (Numbers/Symbols)
+  # Different from Miryoku: Number layer, LHS: GRV in middle & slash (rather than semicolon)
+  NSL = [
+    kc.LBRC, kc.N7, kc.N8, kc.N9,  kc.RBRC,                TTTT, TTTT, TTTT, TTTT, TTTT,
+    kc.GRV,  kc.N4, kc.N5, kc.N6,  kc.EQL,                 TTTT, TTTT, TTTT, TTTT, TTTT,
+    kc.SLSH, kc.N1, kc.N2, kc.N3,  kc.BSLS,                TTTT, TTTT, TTTT, TTTT, TTTT,
+                           kc.DOT, kc.N0,   kc.MINS, TTTT, TTTT, TTTT,
+  ],
+
+  # NSSL (Numbers/Symbols (Shifted))
+  # Different from Miryoku: Number layer, LHS: TILD in middle & slash (rather than colon)
+  NSSL = [
+    ks.LCBR, ks.AMPR, ks.ASTR, ks.LPRN, ks.RCBR,                TTTT, TTTT, TTTT, TTTT, TTTT,
+    ks.TILD, ks.DLR,  ks.PERC, ks.CIRC, ks.PLUS,                TTTT, TTTT, TTTT, TTTT, TTTT,
+    ks.QUES, ks.EXLM, ks.AT,   ks.HASH, ks.PIPE,                TTTT, TTTT, TTTT, TTTT, TTTT,
+                               ks.LPRN, ks.RPRN, ks.UNDS, TTTT, TTTT, TTTT,
+  ],
+
+  # FunL (Function keys etc.)
+  FunL = [
+    kc.F12, kc.F7, kc.F8, kc.F9, kc.PSCR,             TTTT, TTTT, TTTT, TTTT, TTTT,
+    kc.F11, kc.F4, kc.F5, kc.F6, kc.SCRL,             TTTT, TTTT, TTTT, TTTT, TTTT,
+    kc.F10, kc.F1, kc.F2, kc.F3, kc.PAUS,             TTTT, TTTT, TTTT, TTTT, TTTT,
+                          TTTT,  TTTT,    TTTT, TTTT, TTTT, TTTT,
+  ],
+
+} in
+
+let
+  layer_indices = (std.record.fields supplemental_layers_record)
+    |> std.array.fold_left (fun acc l => acc @ [ { field = l, value = num_base_layers + std.array.length acc }]) []
+    |> std.record.from_array
+in
+let supplemental_layers = std.record.values supplemental_layers_record in
 
 
 # Tap-Hold keys used in the thumb cluster
-let SPC_NAVR = LT _NAVR kc.SPC in
-let TAB_MOUR = LT _MOUR kc.TAB in
-let ESC_MEDR = LT _MEDR kc.ESC in
-let BKSP_NSL = LT _NSL kc.BSPC in
-let ENT_NSSL = LT _NSSL kc.ENT in
-let DEL_FUNL = LT _FUNL kc.DEL in
+let SPC_NAVR = LT layer_indices.NavR kc.SPC in
+let TAB_MOUR = LT layer_indices.MouR kc.TAB in
+let ESC_MEDR = LT layer_indices.MedR kc.ESC in
+let BKSP_NSL = LT layer_indices.NSL  kc.BSPC in
+let ENT_NSSL = LT layer_indices.NSSL kc.ENT in
+let DEL_FUNL = LT layer_indices.FunL kc.DEL in
 
 
 # Keymap and Home-Row Modifier Helper functions
@@ -122,65 +181,6 @@ let base_layers = [
     SEG5_DVORAK_LHS_2 @ SEG5_DVORAK_RHS_2 @
     SEG5_DVORAK_LHS_3 @ SEG5_DVORAK_RHS_3 @
                   THUMB_ROW,
-] in
-
-let supplemental_layers = [
-
-# NavR (Navigation keys)
-## TBI: "Desktop Keys": set-OS (Win, MacOS, Linux)
-## TBI: Different from Miryoku: Nav, RHS, upper: TBI the convenience cut/copy/paste and undo/redo
-[
-  TTTT, TTTT, TTTT, TTTT, TTTT,               TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,               kc.LEFT, kc.DOWN, kc.UP,   kc.RGHT, CW,
-  TTTT, TTTT, TTTT, TTTT, TTTT,               kc.HOME, kc.PGDN, kc.PGUP, kc.END,  kc.INS,
-                    TTTT, TTTT, TTTT, kc.SPC, kc.BSPC, kc.DEL,
-],
-
-# MouR (Mouse keys)
-[
-  TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,                ms.LEFT, ms.DOWN, ms.UP,   ms.RGHT, TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    ms.WH_D, ms.WH_U, TTTT,    TTTT,
-                    TTTT, TTTT, TTTT, ms.BTN1, ms.BTN2, ms.BTN3,
-],
-
-# MedR (Media keys)
-# Different from Miryoku: No RGB, no external power, no bluetooth.
-# Different from Miryoku: Used to change default base layer / enter bootloader.
-# TBI: fak/keycodencl: tap.custom.media.STOP key.
-[
-  TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,                me.PREV, me.VOLD, me.VOLU, me.NEXT, TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    BOOT,
-                    TTTT, TTTT, TTTT, me.PLAY, TTTT,    me.MUTE,
-],
-
-# NSL (Numbers/Symbols)
-# Different from Miryoku: Number layer, LHS: GRV in middle & slash (rather than semicolon)
-[
-  kc.LBRC, kc.N7, kc.N8, kc.N9,  kc.RBRC,                TTTT, TTTT, TTTT, TTTT, TTTT,
-  kc.GRV,  kc.N4, kc.N5, kc.N6,  kc.EQL,                 TTTT, TTTT, TTTT, TTTT, TTTT,
-  kc.SLSH, kc.N1, kc.N2, kc.N3,  kc.BSLS,                TTTT, TTTT, TTTT, TTTT, TTTT,
-                         kc.DOT, kc.N0,   kc.MINS, TTTT, TTTT, TTTT,
-],
-
-# NSL (Numbers/Symbols (Shifted))
-# Different from Miryoku: Number layer, LHS: TILD in middle & slash (rather than colon)
-[
-  ks.LCBR, ks.AMPR, ks.ASTR, ks.LPRN, ks.RCBR,                TTTT, TTTT, TTTT, TTTT, TTTT,
-  ks.TILD, ks.DLR,  ks.PERC, ks.CIRC, ks.PLUS,                TTTT, TTTT, TTTT, TTTT, TTTT,
-  ks.QUES, ks.EXLM, ks.AT,   ks.HASH, ks.PIPE,                TTTT, TTTT, TTTT, TTTT, TTTT,
-                             ks.LPRN, ks.RPRN, ks.UNDS, TTTT, TTTT, TTTT,
-],
-
-# FunL (Function keys etc.)
-[
-  kc.F12, kc.F7, kc.F8, kc.F9, kc.PSCR,             TTTT, TTTT, TTTT, TTTT, TTTT,
-  kc.F11, kc.F4, kc.F5, kc.F6, kc.SCRL,             TTTT, TTTT, TTTT, TTTT, TTTT,
-  kc.F10, kc.F1, kc.F2, kc.F3, kc.PAUS,             TTTT, TTTT, TTTT, TTTT, TTTT,
-                        TTTT,  TTTT,    TTTT, TTTT, TTTT, TTTT,
-],
-
 ] in
 
 
