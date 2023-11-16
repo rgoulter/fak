@@ -2,6 +2,7 @@
 #  which is a slightly modified Miryoku layout.
 
 let keycode = import "../../../fak/keycode.ncl" in
+let { dvorak, to_keycode_segments, .. } = import "../../../layouts.ncl" in
 
 
 # Prelude aliases
@@ -72,16 +73,6 @@ in [
     mod.lsft,
 ] in
 
-# Construct array with fak keycodes for each letter in the string.
-#
-# Casing is ignored; letters are unshifted. i.e. "a1!" is treated the same as "A1!".
-#
-# e.g. lift_to_keycodes "qwerty" == [kc.Q, kc.W, kc.E, kc.R, kc.T, kc.Y]
-let lift_to_keycodes = fun letters => letters
-  |> std.string.uppercase
-  |> std.string.characters
-  |> std.array.map (fun c => keycode.tap.reg.kc."%{c}") in
-
 # Augments an array of keycodes with home row modifier behaviours,
 #  for the LHS home row keycodes.
 #
@@ -109,13 +100,14 @@ let with_home_row_mods_rhs = fun keycodes =>
   keycodes |> std.array.reverse |> with_home_row_mods_lhs |> std.array.reverse in
 
 # Alphabetical Segments, Dvorak
-let SEG5_DVORAK_LHS_1 = "',.py" |> lift_to_keycodes in
-let SEG5_DVORAK_LHS_2 = "aoeui" |> lift_to_keycodes |> with_home_row_mods_lhs in
-let SEG5_DVORAK_LHS_3 = ";qjkx" |> lift_to_keycodes in
+let dvorak_segments = to_keycode_segments dvorak in
+let SEG5_DVORAK_LHS_1 = dvorak_segments.lhs1 in
+let SEG5_DVORAK_LHS_2 = dvorak_segments.lhs2 |> with_home_row_mods_lhs in
+let SEG5_DVORAK_LHS_3 = dvorak_segments.lhs3 in
 
-let SEG5_DVORAK_RHS_1 = "fgcrl" |> lift_to_keycodes in
-let SEG5_DVORAK_RHS_2 = "dhtns" |> lift_to_keycodes |> with_home_row_mods_rhs in
-let SEG5_DVORAK_RHS_3 = "bmwvz" |> lift_to_keycodes in
+let SEG5_DVORAK_RHS_1 = dvorak_segments.rhs1 in
+let SEG5_DVORAK_RHS_2 = dvorak_segments.rhs2 |> with_home_row_mods_rhs in
+let SEG5_DVORAK_RHS_3 = dvorak_segments.rhs3 in
 
 
 # Different from Miryoku: LHS: miryoku has tab on the medial key; i.e. ESC/MedR, Spc/NavR, Tab/MouR.
