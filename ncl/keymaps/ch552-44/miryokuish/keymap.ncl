@@ -19,6 +19,10 @@ let TTTT = keycode.tap.trans & keycode.hold.trans in
 
 let BOOT = keycode.tap.custom.fak.BOOT in
 
+# Keycodes to switch the alphas layer.
+let BASE = keycode.tap.layer.DF 0 in
+let EXTRA = keycode.tap.layer.DF 1 in
+
 # Tap hold behaviors
 let holdtap_behavior_common = {
   timeout_ms = 200,
@@ -28,9 +32,16 @@ let holdtap_behavior_common = {
 # Number of alpha layers, e.g. Dvorak, Qwerty, etc.
 #
 # (The number of layers to use before the layers used by the thumb keys).
-let num_base_layers = 1 in
+let num_base_layers = 2 in
 let num_supplemental_layers = 6 in
 let num_layers = num_base_layers + num_supplemental_layers in
+
+# Keycodes for Miryoku's Additional Features
+let af = {
+  boot  = keycode.td.make 255 [XXXX, BOOT],
+  base  = keycode.td.make 255 [XXXX, BASE],
+  extra = keycode.td.make 255 [XXXX, EXTRA],
+} in
 
 # Convenience tap-hold functions
 let LT = fun layer_num tap => keycode.LT holdtap_behavior_common layer_num tap in
@@ -107,28 +118,43 @@ let with_home_row_mods_rhs = fun keycodes =>
   # reverse keycodes so it's "lhs", add mods, then reverse that.
   keycodes |> std.array.reverse |> with_home_row_mods_lhs |> std.array.reverse in
 
-# Alphabetical Segments, QWERTY
-let alphas_segments = layouts.to_keycode_segments layouts.qwerty in
-let SEG5_QWERTY_LHS_1 = alphas_segments.lhs1 in
-let SEG5_QWERTY_LHS_2 = alphas_segments.lhs2 |> with_home_row_mods_lhs in
-let SEG5_QWERTY_LHS_3 = alphas_segments.lhs3 in
-
-let SEG5_QWERTY_RHS_1 = alphas_segments.rhs1 in
-let SEG5_QWERTY_RHS_2 = alphas_segments.rhs2 |> with_home_row_mods_rhs in
-let SEG5_QWERTY_RHS_3 = alphas_segments.rhs3 in
-
 
 let THUMB_ROW = [
     ESC_MEDR, SPC_NAVR, TAB_MOUR,    ENT_NSSL, BKSP_NSL, DEL_FUNL
 ] in
 
-# Base Layers
-# 0: QWERTY
-let base_layers = [
-    SEG5_QWERTY_LHS_1  @                SEG5_QWERTY_RHS_1 @
-    SEG5_QWERTY_LHS_2  @                SEG5_QWERTY_RHS_2 @
-    SEG5_QWERTY_LHS_3  @ [XXXX, XXXX] @ SEG5_QWERTY_RHS_3 @
-    [XXXX, XXXX, XXXX] @  THUMB_ROW   @ [XXXX, XXXX, XXXX],
+# Takes in a 30-character string for the alphabetical keys,
+# and constructs the base layer for the keymap.
+#
+# The home row keys are augmented with home row modifiers.
+let make_base_layer = fun alphas_str =>
+  let segments = layouts.to_keycode_segments alphas_str in
+  let lhs1 = segments.lhs1 in
+  let lhs2 = segments.lhs2 |> with_home_row_mods_lhs in
+  let lhs3 = segments.lhs3 in
+
+  let rhs1 = segments.rhs1 in
+  let rhs2 = segments.rhs2 |> with_home_row_mods_rhs in
+  let rhs3 = segments.rhs3 in
+
+  # Might as well add pinky modifiers.
+  let mod = keycode.tap.reg.mod in
+  let lhs_pinky = [mod.lctl, mod.lgui, mod.lalt] in
+  let rhs_pinky = [mod.ralt, mod.rgui, mod.rctl] in
+
+  lhs1 @                      rhs1 @
+  lhs2 @                      rhs2 @
+  lhs3 @      [BASE, EXTRA] @ rhs3 @
+  lhs_pinky @   THUMB_ROW   @ rhs_pinky in
+
+# Alphas Layers
+
+let alphas_layers = [
+    # Base: QWERTY
+    make_base_layer layouts.qwerty,
+
+    # Extra: Dvorak
+    make_base_layer layouts.dvorak,
 ] in
 
 
@@ -140,80 +166,62 @@ let base_layers = [
 #   MIRYOKU_NAV=VI
 let supplemental_layers = [
 
-# NavR (Navigation keys)
-## TBI: Different from Miryoku: Nav, RHS, upper: TBI the convenience cut/copy/paste and undo/redo
-[
-  TTTT, TTTT, TTTT, TTTT, TTTT,               TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,               kc.LEFT, kc.DOWN, kc.UP,   kc.RGHT, kc.CAPS,
-  TTTT, TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,   kc.HOME, kc.PGDN, kc.PGUP, kc.END,  kc.INS,
-  TTTT, TTTT, TTTT, TTTT, TTTT, TTTT, kc.SPC, kc.BSPC, kc.DEL,  TTTT,    TTTT,    TTTT,
-],
+  # NavR (Navigation keys)
+  ## TBI: Different from Miryoku: Nav, RHS, upper: TBI the convenience cut/copy/paste and undo/redo
+  [
+    af.boot, TTTT, af.extra, af.base, TTTT,               TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT,               kc.LEFT, kc.DOWN, kc.UP,   kc.RGHT, kc.CAPS,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT, TTTT, TTTT,   kc.HOME, kc.PGDN, kc.PGUP, kc.END,  kc.INS,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT, TTTT, kc.SPC, kc.BSPC, kc.DEL,  TTTT,    TTTT,    TTTT,
+  ],
 
-# MouR (Mouse keys)
-[
-  TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,                ms.LEFT, ms.DOWN, ms.UP,   ms.RGHT, TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,    TTTT,    ms.WH_D, ms.WH_U, TTTT,    TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT, TTTT, ms.BTN1, ms.BTN2, ms.BTN3, TTTT,    TTTT,    TTTT,
-],
+  # MouR (Mouse keys)
+  [
+    af.boot, TTTT, af.extra, af.base, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT,                ms.LEFT, ms.DOWN, ms.UP,   ms.RGHT, TTTT,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT, TTTT, TTTT,    TTTT,    ms.WH_D, ms.WH_U, TTTT,    TTTT,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT, TTTT, ms.BTN1, ms.BTN2, ms.BTN3, TTTT,    TTTT,    TTTT,
+  ],
 
-# MedR (Media keys)
-# Different from Miryoku: No RGB, no external power, no bluetooth.
-# Different from Miryoku: Used to enter bootloader.
-# TBI: fak/keycodencl: tap.custom.media.STOP key.
-[
-  TTTT, TTTT, TTTT, TTTT, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT,                me.PREV, me.VOLD, me.VOLU, me.NEXT, TTTT,
-  TTTT, TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,    TTTT,    TTTT,    TTTT,    TTTT,    BOOT,
-  TTTT, TTTT, TTTT, TTTT, TTTT, TTTT, me.PLAY, TTTT,    me.MUTE, TTTT,    TTTT,    TTTT,
-],
+  # MedR (Media keys)
+  # Different from Miryoku: No RGB, no external power, no bluetooth.
+  # TBI: fak/keycodencl: tap.custom.media.STOP key.
+  [
+    af.boot, TTTT, af.extra, af.base, TTTT,                TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT,                me.PREV, me.VOLD, me.VOLU, me.NEXT, TTTT,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT, TTTT, TTTT,    TTTT,    TTTT,    TTTT,    TTTT,    TTTT,
+    TTTT,    TTTT, TTTT,     TTTT,    TTTT, TTTT, me.PLAY, TTTT,    me.MUTE, TTTT,    TTTT,    TTTT,
+  ],
 
-# NSL (Numbers/Symbols)
-[
-  kc.LBRC, kc.N7, kc.N8, kc.N9,  kc.RBRC,                TTTT, TTTT, TTTT, TTTT, TTTT,
-  kc.SCLN, kc.N4, kc.N5, kc.N6,  kc.EQL,                 TTTT, TTTT, TTTT, TTTT, TTTT,
-  kc.GRV,  kc.N1, kc.N2, kc.N3,  kc.BSLS, TTTT,    TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,
-  TTTT,    TTTT,  TTTT,  kc.DOT, kc.N0,   kc.MINS, TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,
-],
+  # NSL (Numbers/Symbols)
+  [
+    kc.LBRC, kc.N7, kc.N8, kc.N9,  kc.RBRC,                TTTT, af.base, af.extra, TTTT, af.boot,
+    kc.SCLN, kc.N4, kc.N5, kc.N6,  kc.EQL,                 TTTT, TTTT,    TTTT,     TTTT, TTTT,
+    kc.GRV,  kc.N1, kc.N2, kc.N3,  kc.BSLS, TTTT,    TTTT, TTTT, TTTT,    TTTT,     TTTT, TTTT,
+    TTTT,    TTTT,  TTTT,  kc.DOT, kc.N0,   kc.MINS, TTTT, TTTT, TTTT,    TTTT,     TTTT, TTTT,
+  ],
 
-# NSL (Numbers/Symbols (Shifted))
-[
-  ks.LCBR, ks.AMPR, ks.ASTR, ks.LPRN, ks.RCBR,                TTTT, TTTT, TTTT, TTTT, TTTT,
-  ks.COLN, ks.DLR,  ks.PERC, ks.CIRC, ks.PLUS,                TTTT, TTTT, TTTT, TTTT, TTTT,
-  ks.TILD, ks.EXLM, ks.AT,   ks.HASH, ks.PIPE, TTTT,    TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,
-  TTTT,    TTTT,    TTTT,    ks.LPRN, ks.RPRN, ks.UNDS, TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,
-],
+  # NSL (Numbers/Symbols (Shifted))
+  [
+    ks.LCBR, ks.AMPR, ks.ASTR, ks.LPRN, ks.RCBR,                TTTT, af.base, af.extra, TTTT, af.boot,
+    ks.COLN, ks.DLR,  ks.PERC, ks.CIRC, ks.PLUS,                TTTT, TTTT,    TTTT,     TTTT, TTTT,
+    ks.TILD, ks.EXLM, ks.AT,   ks.HASH, ks.PIPE, TTTT,    TTTT, TTTT, TTTT,    TTTT,     TTTT, TTTT,
+    TTTT,    TTTT,    TTTT,    ks.LPRN, ks.RPRN, ks.UNDS, TTTT, TTTT, TTTT,    TTTT,     TTTT, TTTT,
+  ],
 
-# FunL (Function keys etc.)
-[
-  kc.F12, kc.F7, kc.F8, kc.F9, kc.PSCR,             TTTT, TTTT, TTTT, TTTT, TTTT,
-  kc.F11, kc.F4, kc.F5, kc.F6, kc.SCRL,             TTTT, TTTT, TTTT, TTTT, TTTT,
-  kc.F10, kc.F1, kc.F2, kc.F3, kc.PAUS, TTTT, TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,
-  TTTT,   TTTT,  TTTT,  TTTT,  TTTT,    TTTT, TTTT, TTTT, TTTT, TTTT, TTTT, TTTT,
-],
+  # FunL (Function keys etc.)
+  [
+    kc.F12, kc.F7, kc.F8, kc.F9, kc.PSCR,             TTTT, af.base, af.extra, TTTT, af.boot,
+    kc.F11, kc.F4, kc.F5, kc.F6, kc.SCRL,             TTTT, TTTT,    TTTT,     TTTT, TTTT,
+    kc.F10, kc.F1, kc.F2, kc.F3, kc.PAUS, TTTT, TTTT, TTTT, TTTT,    TTTT,     TTTT, TTTT,
+    TTTT,   TTTT,  TTTT,  TTTT,  TTTT,    TTTT, TTTT, TTTT, TTTT,    TTTT,     TTTT, TTTT,
+  ],
 
 ] in
 
 
-# Combo Indices definitions
-# the four corners of the alpha keys
-let alphas_four_corner_indices = [0, 9, 20, 31] in
-
-
 # Keymap definition
 {
-  virtual_keys = [
-    keycode.combo.make 255 alphas_four_corner_indices,
-  ],
-  layers =
-    let combo_keys = [
-      # Combo 0 (four corners of alpha keys): enter bootloader
-      keycode.tap.custom.fak.BOOT,
-    ] in
-
-    # Concatenate combo keys to each layer
-    std.array.map
-      (fun layer =>
-        layer @ combo_keys)
-      (base_layers @ supplemental_layers),
+  virtual_keys = [],
+  layers = alphas_layers @ supplemental_layers,
 }
