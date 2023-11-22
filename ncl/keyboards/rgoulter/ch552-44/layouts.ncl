@@ -1,7 +1,4 @@
 # Functions to support different layouts for the ch552-44.
-#
-# Virtual Keys not handled.
-# Only 44 keys are returned for each layer.
 
 let keycode = import "../../../fak/keycode.ncl" in
 
