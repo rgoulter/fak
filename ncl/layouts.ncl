@@ -21,6 +21,9 @@ in {
     aoeui dhtns
     ;qjkx bmwvz
   "%,
+  # Miryoku's Dvorak layout uses '/'
+  # to be more consistent with other alphas layouts.
+  miryoku_dvorak = std.string.replace ";" "/" dvorak,
   halmak = m%"
     wlrbz ;qudj
     shnt, .aeoi
