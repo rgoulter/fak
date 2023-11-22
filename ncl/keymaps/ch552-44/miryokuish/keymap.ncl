@@ -154,7 +154,7 @@ let alphas_layers = [
     make_base_layer layouts.qwerty,
 
     # Extra: Dvorak
-    make_base_layer layouts.dvorak,
+    make_base_layer layouts.miryoku_dvorak,
 ] in
 
 
