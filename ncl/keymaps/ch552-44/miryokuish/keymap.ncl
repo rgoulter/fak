@@ -201,7 +201,7 @@ let supplemental_layers = [
     TTTT,    TTTT,  TTTT,  kc.DOT, kc.N0,   kc.MINS, TTTT, TTTT, TTTT,    TTTT,     TTTT, TTTT,
   ],
 
-  # NSL (Numbers/Symbols (Shifted))
+  # NSSL (Numbers/Symbols (Shifted))
   [
     ks.LCBR, ks.AMPR, ks.ASTR, ks.LPRN, ks.RCBR,                TTTT, af.base, af.extra, TTTT, af.boot,
     ks.COLN, ks.DLR,  ks.PERC, ks.CIRC, ks.PLUS,                TTTT, TTTT,    TTTT,     TTTT, TTTT,
