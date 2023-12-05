@@ -16,6 +16,9 @@ in {
     arstg mneio
     zxcdv kh,./
   "%,
+  # Miryoku's alphas have `;` on sym layer,
+  # and `'` on base layer.
+  colemak_dhm_miryoku = std.string.replace ";" "'" colemak_dhm,
   dvorak = m%"
     ',.py fgcrl
     aoeui dhtns
@@ -23,22 +26,31 @@ in {
   "%,
   # Miryoku's Dvorak layout uses '/'
   # to be more consistent with other alphas layouts.
-  miryoku_dvorak = std.string.replace ";" "/" dvorak,
+  dvorak_miryoku = std.string.replace ";" "/" dvorak,
   halmak = m%"
     wlrbz ;qudj
     shnt, .aeoi
     fmvc/ gpxky
   "%,
+  # Miryoku's alphas have `;` on sym layer,
+  # and `'` on base layer.
+  halmak_miryoku = std.string.replace ";" "'" halmak,
   qwerty = m%"
     qwert yuiop
     asdfg hjkl;
     zxcvb nm,./
   "%,
+  # Miryoku's alphas have `;` on sym layer,
+  # and `'` on base layer.
+  qwerty_miryoku = std.string.replace ";" "'" qwerty,
   workman = m%"
     qdrwb jfup;
     ashtg yneoi
     zxmcv kl,./
   "%,
+  # Miryoku's alphas have `;` on sym layer,
+  # and `'` on base layer.
+  workman_miryoku = std.string.replace ";" "'" workman,
 } |> std.record.map_values fixup_alphas & {
   # Construct array with fak keycodes for each letter in the string.
   #

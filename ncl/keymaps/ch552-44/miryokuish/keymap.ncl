@@ -151,10 +151,10 @@ let make_base_layer = fun alphas_str =>
 
 let alphas_layers = [
     # Base: QWERTY
-    make_base_layer layouts.qwerty,
+    make_base_layer layouts.qwerty_miryoku,
 
     # Extra: Dvorak
-    make_base_layer layouts.miryoku_dvorak,
+    make_base_layer layouts.dvorak_miryoku,
 ] in
 
 
