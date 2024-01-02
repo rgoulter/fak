@@ -22,7 +22,7 @@ let XXXX = keycode.tap.none & keycode.hold.none in
 let TTTT = keycode.tap.trans & keycode.hold.trans in
 
 let BOOT = keycode.tap.custom.fak.BOOT in
-let CW = keycode.tap.custom.caps_word.TOGG in
+let CW = keycode.tap.custom.fak.CWTG in
 
 # Tap hold behaviors
 let holdtap_behavior_common = {
