@@ -196,6 +196,8 @@ let alphas_four_corner_indices = [0, 9, 20, 29] in
 let lhs_lower_12_indices = [22, 23] in
 # the index & middle fingers on lower row, RHS ("M," on QWERTY)
 let rhs_lower_12_indices = [26, 27] in
+let lhs_medial_thumbkey_indices = [31, 32] in
+let rhs_medial_thumbkey_indices = [33, 34] in
 
 # Convenience keycode definitions
 
@@ -208,6 +210,8 @@ let LINUX_DESKTOP_RIGHT = kc.RGHT & mod.lctl & mod.lalt in
 # Keymap definition
 {
   virtual_keys = [
+    keycode.combo.make 255 lhs_medial_thumbkey_indices,
+    keycode.combo.make 255 rhs_medial_thumbkey_indices,
     keycode.combo.make 255 alphas_four_corner_indices,
     keycode.combo.make 50 lhs_lower_12_indices,
     keycode.combo.make 50 rhs_lower_12_indices,
@@ -225,6 +229,9 @@ let LINUX_DESKTOP_RIGHT = kc.RGHT & mod.lctl & mod.lalt in
     # Concatenate combo keys to each layer
     std.array.map
       (fun layer =>
-        layer @ combo_keys)
+        # Treat using the two medial thumb keys at the same time as the distal thumb key.
+        let lhs_distal_thumbkey = std.array.at 30 layer in
+        let rhs_distal_thumbkey = std.array.at 35 layer in
+        layer @ [lhs_distal_thumbkey, rhs_distal_thumbkey] @ combo_keys)
       (base_layers @ supplemental_layers),
 }
